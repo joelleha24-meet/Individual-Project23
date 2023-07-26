@@ -8,11 +8,12 @@ config = {'apiKey': "AIzaSyAV4nP0Aw0CvO-ZSHq72-4d521IRimIh6M",
   'storageBucket': "joelle-project-268cc.appspot.com",
   'messagingSenderId': "782530638490",
   'appId': "1:782530638490:web:84c3485f302ef175ae6523",
-  "databaseURL": ""}
+  "databaseURL": "https://joelle-project-268cc-default-rtdb.europe-west1.firebasedatabase.app/"}
 
 
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
+db = firebase.database()
 
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
@@ -32,6 +33,7 @@ def form():
         email = request.form['email']
         password = request.form['password']
         age = int(request.form['age'])
+
         try:
             login_session['user'] = auth.create_user_with_email_and_password(email, password)
             UID = login_session['user']['localId']
@@ -45,9 +47,50 @@ def form():
                 return redirect('/adult')
             else:
                 return redirect('/minor')
-        except:
+        except Exception as e:
+            return f"{e}"
             return 'submiting failed'
     return render_template('form.html')
+
+
+@app.route('/signin', methods=['GET', 'POST'])
+def signin():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        print(email,password)
+        try:
+            login_session['user'] = auth.sign_in_with_email_and_password(email, password)
+            UID = login_session['user']['localId']
+            age = db.child('User').child(UID).get().val()['age']
+            user = {"age":age, "email": email,"password":password}
+            hey = db.child("User").child(UID).get().val()
+            if age <= 0 or not email or not password:
+                error_msg = "Error, please try again, make sure that your age is bigger than 0, and that you enter your name and your last name, thank you!"
+                return render_template('form.html', error_msg=error_msg)
+            elif age >= 18:
+                return redirect(url_for('adult'))
+            else:
+                return redirect(url_for('minor'))
+        except Exception as e:
+            return f"{e}"
+    return render_template('signin.html')
+
+
+# @app.route('/', methods=['GET', 'POST'])
+# def signin():
+#     if request.method == 'POST':
+#         email = request.form['email']
+#         password = request.form['password']
+#         try:
+#             login_session['user'] = auth.sign_in_with_email_and_password(email, password)
+#             return redirect(url_for('add_tweet'))
+#         except Exception as e:
+#             return f"{e}"
+#     return render_template("signin.html")
+
+
+
 @app.route('/minor')
 def minor():
     return render_template('minor.html')
