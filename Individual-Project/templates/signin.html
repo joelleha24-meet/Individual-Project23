@@ -1,10 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Signin</title>
+    <!-- <title>Signin</title> -->
+    <link href="../static/css/style.css" rel="stylesheet" type="text/css" />
 </head>
+
 <body>
+    <div class="banner">
+  <div class="navbar">
+  <img src="/images/logot.png" alt="Logo">
+    <ul>
+      <li ><a href="aboutus">About Us</a></li>
+      <li><a href="information">Information</a></li>
+      <li><a href="index">Home</a></li>
+    </ul>
+  </div>
+  
+    <center>
     <form method="post" action="/signin">
         <!-- Heading -->
         <h4>
@@ -39,5 +52,6 @@
     </form>
     <br>
     <a href="/signup"><button>signup</button></a>
+    </center>
 </body>
 </html>
